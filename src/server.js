@@ -9,7 +9,7 @@ const onRequest = (request, response) => {
   const type = request.method;
 
   if (type === 'HEAD') {
-    console.log('max headroom');
+    jsonHandler.getHead(request, response);
   } else if (type === 'POST') {
     const body = [];
     let bodyString;

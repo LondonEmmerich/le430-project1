@@ -1,5 +1,7 @@
 const events = [];
 
+// convert a date in YYYY-MM-DD format to a float, like so:
+// YYYY.MMDD
 function convertDateToFloat(dateString) {
   const dateArray = dateString.split('-');
   const convertedValue = `${dateArray[0]}.${dateArray[1]}${dateArray[2]}`;
@@ -7,6 +9,8 @@ function convertDateToFloat(dateString) {
   return dateFloat;
 }
 
+// get the earliest date an event starts
+// a start will always be before the first end
 function getEarliestDate() {
   let date = 9999;
   for (let i = 0; i < events.length; i += 1) {
@@ -19,6 +23,8 @@ function getEarliestDate() {
   return date;
 }
 
+// get the latest date an event ends
+// an end will always be after the last start
 function getLatestDate() {
   let date = -9999;
   for (let i = 0; i < events.length; i += 1) {
@@ -31,49 +37,54 @@ function getLatestDate() {
   return date;
 }
 
+// respond with json
+const responsdJSON = (request, response, status, data) => {
+  response.writeHead(status, { 'Content-Type': 'application/json' });
+  response.write(JSON.stringify(data));
+  response.end();
+};
+
+// get the timeline to display
 const getTimeline = (request, response) => {
   console.log('Timeline');
   console.log(getEarliestDate());
   console.log(getLatestDate());
+  return responsdJSON(request, response, 200, events);
 };
 
 // add or update an event
 const addEvent = (request, response, body) => {
   // if the data isn't there, exit
   if (!body.event || !body.start || !body.end) {
-    console.log('error');
-  } else {
-    // ensure start is before end
-    const thisBody = body;
-    if (convertDateToFloat(body.start) > convertDateToFloat(body.end)) {
-      const temp = thisBody.start;
-      thisBody.start = thisBody.end;
-      thisBody.end = temp;
-    }
-    let updated = false;
-    // if there is already an event of the same name, update the start and end dates, then exit
-    for (let i = 0; i < events.length; i += 1) {
-      if (thisBody.event === events[i].event) {
-        events[i].start = thisBody.start;
-        events[i].end = thisBody.end;
-        updated = true;
-      }
-    }
+    return responsdJSON(request, response, 400, 'incomplete data');
+  }
+  // ensure start is before end
+  const thisBody = body;
+  if (convertDateToFloat(body.start) > convertDateToFloat(body.end)) {
+    const temp = thisBody.start;
+    thisBody.start = thisBody.end;
+    thisBody.end = temp;
+  }
 
-    // if there is no event with that name,
-    // put the data into an object and add it to the events array
-    if (updated === false) {
-      const obj = {
-        event: thisBody.event,
-        start: thisBody.start,
-        end: thisBody.end,
-      };
-      events.push(obj);
+  // if there is already an event of the same name, update the start and end dates, then exit
+  for (let i = 0; i < events.length; i += 1) {
+    if (thisBody.event === events[i].event) {
+      events[i].start = thisBody.start;
+      events[i].end = thisBody.end;
+      return responsdJSON(request, response, 204, events);
     }
   }
 
+  // if there is no event with that name,
+  // put the data into an object and add it to the events array
+  const obj = {
+    event: thisBody.event,
+    start: thisBody.start,
+    end: thisBody.end,
+  };
+  events.push(obj);
   console.log(events);
-  getTimeline(request, response);
+  return responsdJSON(request, response, 201, events);
 };
 
 // delete an event
@@ -92,8 +103,14 @@ const deleteEvent = (request, response, body) => {
   }
 };
 
+const getHead = (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'application/json' });
+  response.end();
+};
+
 module.exports = {
   addEvent,
   deleteEvent,
   getTimeline,
+  getHead,
 };
