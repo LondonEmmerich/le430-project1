@@ -1,7 +1,7 @@
 const http = require('http');
-const query = require("querystring");
+const query = require('querystring');
 const htmlHandler = require('./htmlResponses');
-const jsonHandler = require("./jsonResponses");
+const jsonHandler = require('./jsonResponses');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
@@ -11,14 +11,14 @@ const onRequest = (request, response) => {
   if (type === 'HEAD') {
     console.log('max headroom');
   } else if (type === 'POST') {
-    let body = [];
+    const body = [];
     let bodyString;
     let bodyParams;
 
-    switch(request.url){
+    switch (request.url) {
       case '/addEvent':
-        //parse the data and run the add event
-        request.on("data", (chunk) => {
+        // parse the data and run the add event
+        request.on('data', (chunk) => {
           body.push(chunk);
         });
         request.on('end', () => {
@@ -27,9 +27,9 @@ const onRequest = (request, response) => {
           jsonHandler.addEvent(request, response, bodyParams);
         });
         break;
-      case "/deleteEvent":
-        //parse the data and run the delete event
-        request.on("data", (chunk) => {
+      case '/deleteEvent':
+        // parse the data and run the delete event
+        request.on('data', (chunk) => {
           body.push(chunk);
         });
         request.on('end', () => {
@@ -37,6 +37,8 @@ const onRequest = (request, response) => {
           bodyParams = query.parse(bodyString);
           jsonHandler.deleteEvent(request, response, bodyParams);
         });
+        break;
+      default:
         break;
     }
   } else {
