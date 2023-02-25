@@ -5,9 +5,45 @@
         <link rel="stylesheet" type="text/css" href="./style.css">
     </head>
     <body>
-        <p>Ra ra rasputin</p>
+        <h1>Timeline Table Maker</h1>
+        <label>Event</label>
+        <input type="text" id="event">
+        <br>
+        <label>Start</label>
+        <input type="date" id="start">
+        <label>End</label>
+        <input type="date" id="end">
+        <br>
+        <button id="add">Add Event</button>
+        <button id="delete">Delete Event</button>
+
         <script>
+            const handleResponse = (response, requestType) => {
+
+            }
             
+            //post response
+            const postResponse = async (call) => {
+                const event = document.querySelector("#event").value;
+                const start = document.querySelector("#start").value;
+                const end = document.querySelector("#end").value;
+
+                //compile a string
+                const postString = `event=${event}&start=${start}&end=${end}`;
+
+                //post the string
+                let fetchResponse = await fetch(call, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: postString
+                });
+            }
+
+            //buttons
+            document.querySelector("#add").addEventListener("click", () => {postResponse("/addEvent")});
+            document.querySelector("#delete").addEventListener("click", () => {postResponse("/deleteEvent")});
         </script>
     </body>
 </html>
