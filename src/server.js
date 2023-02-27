@@ -50,6 +50,9 @@ const onRequest = (request, response) => {
       case '/style.css':
         htmlHandler.getStyle(request, response);
         break;
+      case '/getTimeline':
+        jsonHandler.getTimeline(request, response);
+        break;
       default:
         htmlHandler.notFound(request, response);
         break;

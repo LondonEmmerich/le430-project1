@@ -16,10 +16,34 @@
         <br>
         <button id="add">Add Event</button>
         <button id="delete">Delete Event</button>
+        <button id="timeline">View Timeline</button>
+        <div id="content"></div>
 
         <script>
-            const handleResponse = (response, requestType) => {
+            const handleResponse = async (response) => {
+                //console.log(response);
+                let data = await response.json()/*[
+                    {"event":"The First","start":2022.0202,"end":2022.0222},
+                    {"event":"Dos","start":2021.0910,"end":2021.1010},
+                    {"event":"Triad","start":2023.0101,"end":2023.0210},
+                    2021.0910, 2023.0210
+                ]*/;
+                //console.log(data);
+                let table = `<table>`;
+                for(let i = 0; i < data.length - 2; i++){
+                    table += `<tr><td>${data[i].event}</td><td>${data[i].start}</td><td>${data[i].end}</td></tr>`;
+                }
+                table += `</table>`;
+                document.querySelector("#content").innerHTML = table;
+            }
 
+            const getResponse = async () => {
+                let fetchResponse = await fetch("/getTimeline", {
+                    method:"GET",
+                    headers:{"Content-Type":"application/json"}
+                });
+
+                handleResponse(fetchResponse);
             }
             
             //post response
@@ -35,7 +59,8 @@
                 let fetchResponse = await fetch(call, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Accept":"application/json"
                     },
                     body: postString
                 });
@@ -44,6 +69,7 @@
             //buttons
             document.querySelector("#add").addEventListener("click", () => {postResponse("/addEvent")});
             document.querySelector("#delete").addEventListener("click", () => {postResponse("/deleteEvent")});
+            document.querySelector("#timeline").addEventListener("click", getResponse);
         </script>
     </body>
 </html>

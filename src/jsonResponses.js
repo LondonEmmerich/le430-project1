@@ -3,6 +3,10 @@ const events = [];
 // convert a date in YYYY-MM-DD format to a float, like so:
 // YYYY.MMDD
 function convertDateToFloat(dateString) {
+  console.log(dateString);
+  if (!Number.isNaN(dateString)) {
+    return dateString;
+  }
   const dateArray = dateString.split('-');
   const convertedValue = `${dateArray[0]}.${dateArray[1]}${dateArray[2]}`;
   const dateFloat = parseFloat(convertedValue);
@@ -38,7 +42,7 @@ function getLatestDate() {
 }
 
 // respond with json
-const responsdJSON = (request, response, status, data) => {
+const respondJSON = (request, response, status, data) => {
   response.writeHead(status, { 'Content-Type': 'application/json' });
   response.write(JSON.stringify(data));
   response.end();
@@ -46,17 +50,26 @@ const responsdJSON = (request, response, status, data) => {
 
 // get the timeline to display
 const getTimeline = (request, response) => {
-  console.log('Timeline');
-  console.log(getEarliestDate());
-  console.log(getLatestDate());
-  return responsdJSON(request, response, 200, events);
+  let data = [];
+  data = data.concat(events);
+  const earliest = getEarliestDate();
+  const latest = getLatestDate();
+  // convert all the dates to floats
+  for (let i = 0; i < data.length; i += 1) {
+    data[i].start = convertDateToFloat(data[i].start);
+    data[i].end = convertDateToFloat(data[i].end);
+  }
+  // append the earliest and latest dates to the end of the array
+  data.push(earliest);
+  data.push(latest);
+  return respondJSON(request, response, 200, data);
 };
 
 // add or update an event
 const addEvent = (request, response, body) => {
   // if the data isn't there, exit
   if (!body.event || !body.start || !body.end) {
-    return responsdJSON(request, response, 400, 'incomplete data');
+    return respondJSON(request, response, 400, 'incomplete data');
   }
   // ensure start is before end
   const thisBody = body;
@@ -71,7 +84,7 @@ const addEvent = (request, response, body) => {
     if (thisBody.event === events[i].event) {
       events[i].start = thisBody.start;
       events[i].end = thisBody.end;
-      return responsdJSON(request, response, 204, events);
+      return respondJSON(request, response, 204, events);
     }
   }
 
@@ -84,23 +97,24 @@ const addEvent = (request, response, body) => {
   };
   events.push(obj);
   console.log(events);
-  return responsdJSON(request, response, 201, events);
+  return respondJSON(request, response, 201, events);
 };
 
 // delete an event
 const deleteEvent = (request, response, body) => {
   // if the data isn't there, exit
   if (!body.event || !body.start || !body.end) {
-    return;
+    return respondJSON(request, response, 400, events);
   }
 
   // if there is an event with the same name, delete it
   for (let i = 0; i < events.length; i += 1) {
     if (body.event === events[i].event) {
       events.splice(i, 1);
-      return;
+      return respondJSON(request, response, 201, events);
     }
   }
+  return respondJSON(request, response, 400, events);
 };
 
 const getHead = (request, response) => {
