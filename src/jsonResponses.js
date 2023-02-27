@@ -3,11 +3,8 @@ const events = [];
 // convert a date in YYYY-MM-DD format to a float, like so:
 // YYYY.MMDD
 function convertDateToFloat(dateString) {
-  console.log(dateString);
-  if (!Number.isNaN(dateString)) {
-    return dateString;
-  }
-  const dateArray = dateString.split('-');
+  const dS = dateString.toString();
+  const dateArray = dS.split('-');
   const convertedValue = `${dateArray[0]}.${dateArray[1]}${dateArray[2]}`;
   const dateFloat = parseFloat(convertedValue);
   return dateFloat;
