@@ -5,18 +5,24 @@
         <link rel="stylesheet" type="text/css" href="./style.css">
     </head>
     <body>
-        <h1>Timeline Table Maker</h1>
-        <label>Event</label>
-        <input type="text" id="event">
-        <br>
-        <label>Start</label>
-        <input type="date" id="start">
-        <label>End</label>
-        <input type="date" id="end">
-        <br>
-        <button id="add">Add Event</button>
-        <button id="delete">Delete Event</button>
-        <button id="timeline">View Timeline</button>
+        <div id="header">
+            <h1>Timeline Table Maker</h1>
+        </div>
+        <div id="eventDiv">
+            <label>Event:</label>
+            <input type="text" id="event">
+        </div>
+        <div id="dateDiv">
+            <label>Start:</label>
+            <input type="date" id="start">
+            <label>End:</label>
+            <input type="date" id="end">
+        </div>
+        <div id="buttons">
+            <button id="add">Add Event</button>
+            <button id="delete">Delete Event</button>
+            <button id="timeline">View Timeline</button>
+        </div>
         <div id="content"></div>
 
         <script>
@@ -28,7 +34,6 @@
                     {"event":"Triad","start":2023.0101,"end":2023.0210},
                     2021.0910, 2023.0210
                 ]*/;
-                //console.log(data);
                 let table = `<table>`;
                 for(let i = 0; i < data.length - 2; i++){
                     table += `<tr><td>${data[i].event}</td><td>${data[i].start}</td><td>${data[i].end}</td></tr>`;
