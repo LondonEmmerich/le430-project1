@@ -8,6 +8,10 @@
         <div id="header">
             <h1>Timeline Table Maker</h1>
         </div>
+        <div id="titleDiv">
+            <label>Timeline:</label>
+            <input type="text" id="name">
+        </div>
         <div id="eventDiv">
             <label>Event:</label>
             <input type="text" id="event">
@@ -26,6 +30,194 @@
         <div id="content"></div>
 
         <script>
+            const calendarConvert = (value) => {
+                let dateString = value.toString();
+                let dateArray = dateString.split(".");
+                let year = parseInt(dateArray[0]);
+                let month = parseInt(dateArray[1].substring(0,2));
+                let day = parseInt(dateArray[1].substring(2,4));
+                console.log(`${value},${year},${month},${day}`);
+                //get the month correct
+                while(month > 12){
+                    let overshot = month - 12;
+                    month = overshot;
+                    year++;
+                }
+                //get the day correct
+                switch (month){
+                    case 2:
+                        while(day > 28){
+                            let overshot = day - 28;
+                            day = overshot;
+                            month++;
+                        }
+                        break;
+                    case 1:
+                    case 3:
+                    case 5:
+                    case 7:
+                    case 8:
+                    case 10:
+                    case 12:
+                        while(day > 31){
+                            let overshot = day - 31;
+                            day = overshot;
+                            month++;
+                        }
+                        break;
+                    default:
+                        while(day > 30){
+                            let overshot = day - 30;
+                            day = overshot;
+                            month++;
+                        }
+                        break;
+                }
+                //adjust the month again in case changing the day messed it up
+                while(month > 12){
+                    let overshot = month - 12;
+                    month = overshot;
+                    year++;
+                }
+                let newDate;
+                if(month < 10 && day < 10){
+                    newDate = parseFloat(`${year}.0${month}0${day}`);
+                }
+                else if(month < 10){
+                    newDate = parseFloat(`${year}.0${month}${day}`);
+                }
+                else if(day < 10){
+                    newDate = parseFloat(`${year}.${month}0${day}`);
+                }
+                else{
+                    newDate = parseFloat(`${year}.${month}${day}`);
+                }
+
+                return newDate;
+            }
+
+            const calendarAdd = (date1,date2) => {
+                //get the two values
+                let d1 = calendarConvert(date1);
+                let d2 = calendarConvert(date2);
+
+                //split the first date into parts
+                let dateString = d1.toString();
+                let dateArray = dateString.split(".");
+                let d1y = parseInt(dateArray[0]) || 0;
+                let d1m = parseInt(dateArray[1].substring(0,2)) || 0;
+                let d1d = parseInt(dateArray[1].substring(2,4)) || 0;
+
+                //split the second date into parts
+                dateString = d2.toString();
+                dateArray = dateString.split(".");
+                let d2y = parseInt(dateArray[0]) || 0;
+                let d2m = parseInt(dateArray[1].substring(0,2)) || 0;
+                let d2d = parseInt(dateArray[1].substring(2,4)) || 0;
+
+                let year = d1y+d2y;
+                let month = d1m+d2m;
+                let day = d1d+d2d;
+
+                let newDate;
+                if(month < 10 && day < 10){
+                    newDate = calendarConvert(`${year}.0${month}0${day}`);
+                }
+                else if(month < 10){
+                    newDate = calendarConvert(`${year}.0${month}${day}`);
+                }
+                else if(day < 10){
+                    newDate = calendarConvert(`${year}.${month}0${day}`);
+                }
+                else{
+                    newDate = calendarConvert(`${year}.${month}${day}`);
+                }
+
+                return calendarConvert(`${year}.${month}${day}`);
+            }
+
+            const calendarSubtract = (date1,date2) => {
+                //get the two values
+                let d1 = calendarConvert(date1);
+                let d2 = calendarConvert(date2);
+
+                //split the first date into parts
+                let dateString = d1.toString();
+                let dateArray = dateString.split(".");
+                let d1y = parseInt(dateArray[0]) || 0;
+                let d1m = parseInt(dateArray[1].substring(0,2)) || 0;
+                let d1d = parseInt(dateArray[1].substring(2,4)) || 0;
+
+                //split the second date into parts
+                dateString = d2.toString();
+                dateArray = dateString.split(".");
+                let d2y = parseInt(dateArray[0]) || 0;
+                let d2m = parseInt(dateArray[1].substring(0,2)) || 0;
+                let d2d = parseInt(dateArray[1].substring(2,4)) || 0;
+
+                let yearCombo = d1y-d2y;
+                let monthCombo = d1m-d2m;
+                let dayCombo = d1d-d2d;
+
+                //get the month correct
+                while(monthCombo < 0){
+                    let overshot = monthCombo + 13;
+                    monthCombo = overshot;
+                    yearCombo--;
+                }
+                //get the day correct
+                switch (monthCombo){
+                    case 2:
+                        while(dayCombo < 0){
+                            let overshot = dayCombo + 28;
+                            dayCombo = overshot;
+                            monthCombo--;
+                        }
+                        break;
+                    case 1:
+                    case 3:
+                    case 5:
+                    case 7:
+                    case 8:
+                    case 10:
+                    case 12:
+                        while(dayCombo < 0){
+                            let overshot = dayCombo + 31;
+                            dayCombo = overshot;
+                            monthCombo--;
+                        }
+                        break;
+                    default:
+                        while(dayCombo < 0){
+                            let overshot = dayCombo + 30;;
+                            dayCombo = overshot;
+                            monthCombo--;
+                        }
+                        break;
+                }
+                //adjust the month again in case changing the day messed it up
+                while(monthCombo < 0){
+                    let overshot = monthCombo + 13;
+                    monthCombo = overshot;
+                    yearCombo--;
+                }
+                let newDate;
+                if(monthCombo < 10 && dayCombo < 10){
+                    newDate = parseFloat(`${yearCombo}.0${monthCombo}0${dayCombo}`);
+                }
+                else if(monthCombo < 10){
+                    newDate = parseFloat(`${yearCombo}.0${monthCombo}${dayCombo}`);
+                }
+                else if(dayCombo < 10){
+                    newDate = parseFloat(`${yearCombo}.${monthCombo}0${dayCombo}`);
+                }
+                else{
+                    newDate = parseFloat(`${yearCombo}.${monthCombo}${dayCombo}`);
+                }
+
+                return newDate;
+            }
+
             const handleResponse = async (response) => {
                 //console.log(response);
                 let data = await response.json()/*[
@@ -34,11 +226,47 @@
                     {"event":"Triad","start":2023.0101,"end":2023.0210},
                     2021.0910, 2023.0210
                 ]*/;
-                let table = `<table>`;
-                for(let i = 0; i < data.length - 2; i++){
-                    table += `<tr><td>${data[i].event}</td><td>${data[i].start}</td><td>${data[i].end}</td></tr>`;
+                let table = `<a download><table>`;
+                console.log(calendarSubtract(1300.0507,1200.0708));
+                console.log(calendarSubtract(1300.0507,.0915));
+                console.log(calendarSubtract(1300.0507,.0904));
+                if(data.length === 2){
+                    table = "No data!";
                 }
-                table += `</table>`;
+                else{
+                    const numCells = 11;
+                    let start = data[data.length - 2];
+                    let end = data[data.length - 1];
+                    let length = calendarSubtract(end,start);
+                    console.log(`${end - start},${length}`);
+                    let cellAmt = length / numCells;
+                    console.log(cellAmt);
+                    console.log(cellAmt.toString());
+                    //cellAmt = calendarConvert(parseFloat(cellAmt.toFixed(4)));
+                    //console.log(cellAmt);
+                    for(let i = 0; i < data.length - 2; i++){
+                        table += `<tr><td>${data[i].event}</td>`;
+                        let val = start;
+                        for(let cell = 1; cell <= numCells + 1; cell++){
+                            if(data[i].start <= val + cellAmt && data[i].end >= val - cellAmt){
+                                table += `<td class="filled"></td>`;
+                            }
+                            else{
+                                table += `<td class="empty"></td>`;
+                            }
+                            val = calendarAdd(val,cellAmt);
+                        }
+                        table += `</tr>`;
+                    }
+                    table += `<tr><td></td>`;
+                    let val = start;
+                    for(let i = 0; i < numCells + 1; i++){
+                        table += `<td class="timeline">${val}</td>`;
+                        val = calendarAdd(val,cellAmt);
+                    }
+                    table += `</table></a>`;
+                }
+                
                 document.querySelector("#content").innerHTML = table;
             }
 
@@ -50,15 +278,22 @@
 
                 handleResponse(fetchResponse);
             }
+
+            const handlePost = async (response) => {
+                let data = await response.json();
+                console.log(data);
+                document.querySelector("#content").innerHTML = `<br>${data}`;
+            }
             
             //post response
             const postResponse = async (call) => {
+                const name = document.querySelector("#name").value;
                 const event = document.querySelector("#event").value;
                 const start = document.querySelector("#start").value;
                 const end = document.querySelector("#end").value;
 
                 //compile a string
-                const postString = `event=${event}&start=${start}&end=${end}`;
+                const postString = `name=${name}&event=${event}&start=${start}&end=${end}`;
 
                 //post the string
                 let fetchResponse = await fetch(call, {
@@ -69,6 +304,8 @@
                     },
                     body: postString
                 });
+
+                handlePost(fetchResponse);
             }
 
             //buttons

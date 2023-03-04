@@ -62,6 +62,8 @@ const getTimeline = (request, response) => {
   return respondJSON(request, response, 200, data);
 };
 
+const getJS = (request, response) => getTimeline(request, response);
+
 // add or update an event
 const addEvent = (request, response, body) => {
   // if the data isn't there, exit
@@ -81,7 +83,7 @@ const addEvent = (request, response, body) => {
     if (thisBody.event === events[i].event) {
       events[i].start = thisBody.start;
       events[i].end = thisBody.end;
-      return respondJSON(request, response, 204, events);
+      return respondJSON(request, response, 201, 'event date changed successfully');
     }
   }
 
@@ -94,28 +96,28 @@ const addEvent = (request, response, body) => {
   };
   events.push(obj);
   console.log(events);
-  return respondJSON(request, response, 201, events);
+  return respondJSON(request, response, 201, 'event added successfully');
 };
 
 // delete an event
 const deleteEvent = (request, response, body) => {
   // if the data isn't there, exit
-  if (!body.event || !body.start || !body.end) {
-    return respondJSON(request, response, 400, events);
+  if (!body.event) {
+    return respondJSON(request, response, 400, 'event does not exist');
   }
 
   // if there is an event with the same name, delete it
   for (let i = 0; i < events.length; i += 1) {
     if (body.event === events[i].event) {
       events.splice(i, 1);
-      return respondJSON(request, response, 201, events);
+      return respondJSON(request, response, 201, 'event deleted');
     }
   }
-  return respondJSON(request, response, 400, events);
+  return respondJSON(request, response, 400, 'event deleted');
 };
 
 const getHead = (request, response) => {
-  response.writeHead(200, { 'Content-Type': 'application/json' });
+  response.writeHead(204, { 'Content-Type': 'application/json' });
   response.end();
 };
 
@@ -123,5 +125,6 @@ module.exports = {
   addEvent,
   deleteEvent,
   getTimeline,
+  getJS,
   getHead,
 };

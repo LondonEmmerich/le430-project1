@@ -9,7 +9,14 @@ const onRequest = (request, response) => {
   const type = request.method;
 
   if (type === 'HEAD') {
-    jsonHandler.getHead(request, response);
+    switch (request.url) {
+      case '/headData':
+        jsonHandler.getHead(request, response);
+        break;
+      default:
+        jsonHandler.getHead(request, response);
+        break;
+    }
   } else if (type === 'POST') {
     const body = [];
     let bodyString;
@@ -52,6 +59,9 @@ const onRequest = (request, response) => {
         break;
       case '/getTimeline':
         jsonHandler.getTimeline(request, response);
+        break;
+      case '/getTimeline?js=true':
+        jsonHandler.getJS(request, response);
         break;
       default:
         htmlHandler.notFound(request, response);

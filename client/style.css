@@ -15,7 +15,15 @@ label, button{
 }
 td{
     text-align: center;
+    min-width:2em;
+    border:1px solid black;
 }
 td:first-child{
     text-align:right;
+}
+.filled{
+    background-color:red;
+}
+.timeline{
+    font-size:.5em;
 }
