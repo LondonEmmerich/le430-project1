@@ -10,7 +10,7 @@
         </div>
         <div id="titleDiv">
             <label>Timeline:</label>
-            <input type="text" id="name">
+            <input type="text" id="timeline">
         </div>
         <div id="eventDiv">
             <label>Event:</label>
@@ -25,228 +25,129 @@
         <div id="buttons">
             <button id="add">Add Event</button>
             <button id="delete">Delete Event</button>
-            <button id="timeline">View Timeline</button>
+            <button id="timelineBtn">View Timeline</button>
         </div>
         <div id="content"></div>
 
         <script>
-            const calendarConvert = (value) => {
-                let dateString = value.toString();
-                let dateArray = dateString.split(".");
-                let year = parseInt(dateArray[0]);
-                let month = parseInt(dateArray[1].substring(0,2));
-                let day = parseInt(dateArray[1].substring(2,4));
-                console.log(`${value},${year},${month},${day}`);
-                //get the month correct
-                while(month > 12){
-                    let overshot = month - 12;
-                    month = overshot;
-                    year++;
+            const intToDate = (int) => {
+                let ogValue = int;
+                let date = "";
+
+                //year
+                let year = Math.trunc(ogValue / 365);
+                ogValue -= ((year - 1) * 365);
+                //account for leapyears
+                let leapYears = Math.trunc((year - 1) / 4);
+                ogValue -= leapYears;
+
+                //for every month passed, subtract the amount of days
+                let month = 1;
+                //Jan
+                if(ogValue > 31){
+                    ogValue -= 31;
+                    month += 1;
                 }
-                //get the day correct
-                switch (month){
-                    case 2:
-                        while(day > 28){
-                            let overshot = day - 28;
-                            day = overshot;
-                            month++;
-                        }
-                        break;
-                    case 1:
-                    case 3:
-                    case 5:
-                    case 7:
-                    case 8:
-                    case 10:
-                    case 12:
-                        while(day > 31){
-                            let overshot = day - 31;
-                            day = overshot;
-                            month++;
-                        }
-                        break;
-                    default:
-                        while(day > 30){
-                            let overshot = day - 30;
-                            day = overshot;
-                            month++;
-                        }
-                        break;
+                //Feb
+                if(year % 4 === 0 && ogValue > 29){
+                    ogValue -= 29;
+                    month += 1;
                 }
-                //adjust the month again in case changing the day messed it up
-                while(month > 12){
-                    let overshot = month - 12;
-                    month = overshot;
-                    year++;
+                else if(ogValue > 28){
+                    ogValue -= 28;
+                    month += 1;
                 }
-                let newDate;
+                //March
+                if(ogValue > 31){
+                    ogValue -= 31;
+                    month += 1;
+                }
+                //April
+                if(ogValue > 30){
+                    ogValue -= 30;
+                    month += 1;
+                }
+                //May
+                if(ogValue > 31){
+                    ogValue -= 30;
+                    month += 1;
+                }
+                //June
+                if(ogValue > 30){
+                    ogValue -= 30;
+                    month += 1;
+                }
+                //July
+                if(ogValue > 31){
+                    ogValue -= 31;
+                    month += 1;
+                }
+                //Aug
+                if(ogValue > 31){
+                    ogValue -= 31;
+                    month += 1;
+                }
+                //Sept
+                if(ogValue > 30){
+                    ogValue -= 30;
+                    month += 1;
+                }
+                //Oct
+                if(ogValue > 31){
+                    ogValue -= 31;
+                    month += 1;
+                }
+                //Nov
+                if(ogValue > 30){
+                    ogValue -= 30;
+                    month += 1;
+                }
+                //Dec cannot have passed or we'd be in the next year
+
+                //the day is the remaining values
+                let day = ogValue;
+
+                //account for proper zeroes
                 if(month < 10 && day < 10){
-                    newDate = parseFloat(`${year}.0${month}0${day}`);
+                    date = `${year.toString()}-0${month.toString()}-0${day.toString()}`;
                 }
                 else if(month < 10){
-                    newDate = parseFloat(`${year}.0${month}${day}`);
+                    date = `${year.toString()}-0${month.toString()}-${day.toString()}`;
                 }
                 else if(day < 10){
-                    newDate = parseFloat(`${year}.${month}0${day}`);
+                    date = `${year.toString()}-${month.toString()}-0${day.toString()}`;
                 }
                 else{
-                    newDate = parseFloat(`${year}.${month}${day}`);
+                    date = `${year.toString()}-${month.toString()}-${day.toString()}`;
                 }
 
-                return newDate;
-            }
-
-            const calendarAdd = (date1,date2) => {
-                //get the two values
-                let d1 = calendarConvert(date1);
-                let d2 = calendarConvert(date2);
-
-                //split the first date into parts
-                let dateString = d1.toString();
-                let dateArray = dateString.split(".");
-                let d1y = parseInt(dateArray[0]) || 0;
-                let d1m = parseInt(dateArray[1].substring(0,2)) || 0;
-                let d1d = parseInt(dateArray[1].substring(2,4)) || 0;
-
-                //split the second date into parts
-                dateString = d2.toString();
-                dateArray = dateString.split(".");
-                let d2y = parseInt(dateArray[0]) || 0;
-                let d2m = parseInt(dateArray[1].substring(0,2)) || 0;
-                let d2d = parseInt(dateArray[1].substring(2,4)) || 0;
-
-                let year = d1y+d2y;
-                let month = d1m+d2m;
-                let day = d1d+d2d;
-
-                let newDate;
-                if(month < 10 && day < 10){
-                    newDate = calendarConvert(`${year}.0${month}0${day}`);
-                }
-                else if(month < 10){
-                    newDate = calendarConvert(`${year}.0${month}${day}`);
-                }
-                else if(day < 10){
-                    newDate = calendarConvert(`${year}.${month}0${day}`);
-                }
-                else{
-                    newDate = calendarConvert(`${year}.${month}${day}`);
-                }
-
-                return calendarConvert(`${year}.${month}${day}`);
-            }
-
-            const calendarSubtract = (date1,date2) => {
-                //get the two values
-                let d1 = calendarConvert(date1);
-                let d2 = calendarConvert(date2);
-
-                //split the first date into parts
-                let dateString = d1.toString();
-                let dateArray = dateString.split(".");
-                let d1y = parseInt(dateArray[0]) || 0;
-                let d1m = parseInt(dateArray[1].substring(0,2)) || 0;
-                let d1d = parseInt(dateArray[1].substring(2,4)) || 0;
-
-                //split the second date into parts
-                dateString = d2.toString();
-                dateArray = dateString.split(".");
-                let d2y = parseInt(dateArray[0]) || 0;
-                let d2m = parseInt(dateArray[1].substring(0,2)) || 0;
-                let d2d = parseInt(dateArray[1].substring(2,4)) || 0;
-
-                let yearCombo = d1y-d2y;
-                let monthCombo = d1m-d2m;
-                let dayCombo = d1d-d2d;
-
-                //get the month correct
-                while(monthCombo < 0){
-                    let overshot = monthCombo + 13;
-                    monthCombo = overshot;
-                    yearCombo--;
-                }
-                //get the day correct
-                switch (monthCombo){
-                    case 2:
-                        while(dayCombo < 0){
-                            let overshot = dayCombo + 28;
-                            dayCombo = overshot;
-                            monthCombo--;
-                        }
-                        break;
-                    case 1:
-                    case 3:
-                    case 5:
-                    case 7:
-                    case 8:
-                    case 10:
-                    case 12:
-                        while(dayCombo < 0){
-                            let overshot = dayCombo + 31;
-                            dayCombo = overshot;
-                            monthCombo--;
-                        }
-                        break;
-                    default:
-                        while(dayCombo < 0){
-                            let overshot = dayCombo + 30;;
-                            dayCombo = overshot;
-                            monthCombo--;
-                        }
-                        break;
-                }
-                //adjust the month again in case changing the day messed it up
-                while(monthCombo < 0){
-                    let overshot = monthCombo + 13;
-                    monthCombo = overshot;
-                    yearCombo--;
-                }
-                let newDate;
-                if(monthCombo < 10 && dayCombo < 10){
-                    newDate = parseFloat(`${yearCombo}.0${monthCombo}0${dayCombo}`);
-                }
-                else if(monthCombo < 10){
-                    newDate = parseFloat(`${yearCombo}.0${monthCombo}${dayCombo}`);
-                }
-                else if(dayCombo < 10){
-                    newDate = parseFloat(`${yearCombo}.${monthCombo}0${dayCombo}`);
-                }
-                else{
-                    newDate = parseFloat(`${yearCombo}.${monthCombo}${dayCombo}`);
-                }
-
-                return newDate;
+                return date;
             }
 
             const handleResponse = async (response) => {
-                //console.log(response);
-                let data = await response.json()/*[
-                    {"event":"The First","start":2022.0202,"end":2022.0222},
-                    {"event":"Dos","start":2021.0910,"end":2021.1010},
-                    {"event":"Triad","start":2023.0101,"end":2023.0210},
-                    2021.0910, 2023.0210
-                ]*/;
+                let data = await response.json();
+                console.log(data);
                 let table = `<a download><table>`;
-                console.log(calendarSubtract(1300.0507,1200.0708));
-                console.log(calendarSubtract(1300.0507,.0915));
-                console.log(calendarSubtract(1300.0507,.0904));
+                //if the only data is the default start/end, return that to the user
                 if(data.length === 2){
                     table = "No data!";
                 }
                 else{
+                    //get the base params
                     const numCells = 11;
                     let start = data[data.length - 2];
                     let end = data[data.length - 1];
-                    let length = calendarSubtract(end,start);
-                    console.log(`${end - start},${length}`);
+                    let length = end - start;
+                    //the cellAmt is the amount to increase each cell
                     let cellAmt = length / numCells;
-                    console.log(cellAmt);
-                    console.log(cellAmt.toString());
-                    //cellAmt = calendarConvert(parseFloat(cellAmt.toFixed(4)));
-                    //console.log(cellAmt);
+
+                    //for each event
                     for(let i = 0; i < data.length - 2; i++){
                         table += `<tr><td>${data[i].event}</td>`;
                         let val = start;
+                        //if the cell is between the start and end, 
+                        //with leeway for being inbetween cells,
+                        //color it in
                         for(let cell = 1; cell <= numCells + 1; cell++){
                             if(data[i].start <= val + cellAmt && data[i].end >= val - cellAmt){
                                 table += `<td class="filled"></td>`;
@@ -254,15 +155,19 @@
                             else{
                                 table += `<td class="empty"></td>`;
                             }
-                            val = calendarAdd(val,cellAmt);
+                            //increase the value
+                            val = val + cellAmt;
                         }
                         table += `</tr>`;
                     }
+                    //fill in the timeline at the bottom of the table
                     table += `<tr><td></td>`;
                     let val = start;
                     for(let i = 0; i < numCells + 1; i++){
-                        table += `<td class="timeline">${val}</td>`;
-                        val = calendarAdd(val,cellAmt);
+                        //convert the value back into a date to put it on the timeline
+                        let output = Math.round(val);
+                        table += `<td class="timeline">${intToDate(output)}</td>`;
+                        val = val + cellAmt;
                     }
                     table += `</table></a>`;
                 }
@@ -271,14 +176,17 @@
             }
 
             const getResponse = async () => {
-                let fetchResponse = await fetch("/getTimeline", {
+                //send a response, using the timeline as a query param
+                const timeline = document.querySelector("#timeline").value;
+                let fetchResponse = await fetch(`/getTimeline?timeline=${timeline}`, {
                     method:"GET",
-                    headers:{"Content-Type":"application/json"}
+                    headers:{"Content-Type":"application/json"},
                 });
 
                 handleResponse(fetchResponse);
             }
 
+            //print info to the user on a post request
             const handlePost = async (response) => {
                 let data = await response.json();
                 console.log(data);
@@ -287,13 +195,13 @@
             
             //post response
             const postResponse = async (call) => {
-                const name = document.querySelector("#name").value;
+                const timeline = document.querySelector("#timeline").value;
                 const event = document.querySelector("#event").value;
                 const start = document.querySelector("#start").value;
                 const end = document.querySelector("#end").value;
 
                 //compile a string
-                const postString = `name=${name}&event=${event}&start=${start}&end=${end}`;
+                const postString = `timeline=${timeline}&event=${event}&start=${start}&end=${end}`;
 
                 //post the string
                 let fetchResponse = await fetch(call, {
@@ -311,7 +219,7 @@
             //buttons
             document.querySelector("#add").addEventListener("click", () => {postResponse("/addEvent")});
             document.querySelector("#delete").addEventListener("click", () => {postResponse("/deleteEvent")});
-            document.querySelector("#timeline").addEventListener("click", getResponse);
+            document.querySelector("#timelineBtn").addEventListener("click", getResponse);
         </script>
     </body>
 </html>

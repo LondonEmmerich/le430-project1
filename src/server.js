@@ -48,8 +48,11 @@ const onRequest = (request, response) => {
       default:
         break;
     }
+  // get requests
   } else {
-    switch (request.url) {
+    const urlArray = request.url.split('=');
+    let queryP = '';
+    switch (urlArray[0]) {
       case '/':
       case '/index':
         htmlHandler.getIndex(request, response);
@@ -57,11 +60,14 @@ const onRequest = (request, response) => {
       case '/style.css':
         htmlHandler.getStyle(request, response);
         break;
-      case '/getTimeline':
-        jsonHandler.getTimeline(request, response);
+      // if there is a query parameter, return that specific timeline
+      case '/getTimeline?timeline':
+        queryP = urlArray[1] || '';
+        jsonHandler.getTimeline(request, response, queryP);
         break;
-      case '/getTimeline?js=true':
-        jsonHandler.getJS(request, response);
+      // if not, get the default timeline
+      case '/getTimeline':
+        jsonHandler.getTimeline(request, response, '');
         break;
       default:
         htmlHandler.notFound(request, response);
